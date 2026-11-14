@@ -2,7 +2,7 @@
 import type { Plot } from "../../../shared/contracts";
 import { items } from "../../../shared/catalog";
 import { growthStage, sceneTrees } from "../lib/scene";
-import { ready } from "../lib/crops";
+import { ready, flowering } from "../lib/crops";
 defineProps<{ plots: readonly Readonly<Plot>[]; weather: string }>();
 defineEmits<{ plot: [id: number] }>();
 </script>
@@ -49,6 +49,10 @@ defineEmits<{ plot: [id: number] }>();
             growthStage(plot) === 1 ? "🌱" : items[plot.crop.item].icon
           }}</span><span v-else class="empty-plot">+</span
         ><b v-if="plot.crop && ready(plot.crop)" class="ready-mark">!</b
+        ><b
+          v-else-if="plot.crop && flowering(plot.crop)"
+          class="bloom-mark"
+          >✿</b
         ><i
           v-if="plot.crop"
           class="water-meter"

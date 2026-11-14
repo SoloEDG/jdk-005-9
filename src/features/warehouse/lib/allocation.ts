@@ -20,12 +20,17 @@ export function allocate(
   quantity: number,
   hour: number,
   minQuality = 1,
+  variety?: string,
 ): Allocation[] | null {
   let remaining = quantity;
   const result: Allocation[] = [];
   for (const batch of batches
     .filter(
-      (b) => b.item === item && b.expires > hour && b.quality >= minQuality,
+      (b) =>
+        b.item === item &&
+        b.expires > hour &&
+        b.quality >= minQuality &&
+        (variety === undefined || b.variety === variety),
     )
     .sort((a, b) => a.expires - b.expires)) {
     const n = Math.min(remaining, available(batch, reservations));

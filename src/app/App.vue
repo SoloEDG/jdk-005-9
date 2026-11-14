@@ -5,11 +5,13 @@ import { FarmScene, FieldsPanel } from "../features/fields";
 import { WarehousePanel } from "../features/warehouse";
 import { WorkshopPanel } from "../features/workshop";
 import { OrdersPanel, EconomyPanel } from "../features/orders";
+import { BreedingPanel } from "../features/breeding";
 import { createWorkspace } from "./workspace";
 const farm = createWorkspace(),
   active = ref(0),
   tab = ref("warehouse");
-const { clock, warehouse, fields, workshop, orders, engine, notices } = farm;
+const { clock, warehouse, fields, breeding, workshop, orders, engine, notices } =
+  farm;
 const timer = setInterval(() => {
   if (!clock.state.paused) engine.advance(1);
 }, 1500);
@@ -69,10 +71,13 @@ function reset() {
             :plots="fields.state.plots"
             :selected="fields.state.selected"
             :active="active"
+            :stocks="breeding.state.stocks"
+            :varieties="breeding.state.varieties"
             @select="fields.select"
             @plant="(id) => fields.plant(id, clock.state.hour)"
             @water="fields.water"
-            @harvest="fields.harvest"
+            @harvest="(id, mode) => farm.harvestPlot(id, mode)"
+            @remove="farm.removePlot"
           />
           <section class="activity">
             <span>农场手记</span>
@@ -97,7 +102,12 @@ function reset() {
               :class="{ active: tab === 'orders' }"
               @click="tab = 'orders'"
             >
-              订单
+              订单</button
+            ><button
+              :class="{ active: tab === 'breeding' }"
+              @click="tab = 'breeding'"
+            >
+              育种
             </button>
           </div>
           <WarehousePanel
@@ -106,6 +116,7 @@ function reset() {
             :hour="clock.state.hour"
             :free="warehouse.free"
             :wasted="warehouse.state.wasted"
+            :varieties="breeding.state.varieties"
             @sell="farm.sell"
           /><WorkshopPanel
             v-if="tab === 'workshop'"
@@ -117,9 +128,27 @@ function reset() {
             v-if="tab === 'orders'"
             :orders="orders.state.orders"
             :hour="clock.state.hour"
+            :varieties="breeding.state.varieties"
             @reserve="orders.reserve"
             @deliver="(id) => orders.deliver(id, clock.state.hour)"
             @cancel="orders.cancel"
+          /><BreedingPanel
+            v-if="tab === 'breeding'"
+            :plots="fields.state.plots"
+            :varieties="breeding.state.varieties"
+            :stocks="breeding.state.stocks"
+            :crosses="breeding.state.crosses"
+            :orders="breeding.state.orders"
+            :draft="breeding.state.draft"
+            :hour="clock.state.hour"
+            @choose="(slot, plot) => breeding.choose(slot, plot)"
+            @drop="breeding.drop"
+            @start="breeding.start(clock.state.hour)"
+            @cancel="breeding.cancel"
+            @register="
+              (id, name) => breeding.register(id, name, clock.state.hour)
+            "
+            @fulfill="(id) => breeding.fulfill(id, clock.state.hour)"
           />
           <div class="tip-card">
             <span>✦ 今日小贴士</span>

@@ -802,6 +802,194 @@ progress {
   accent-color: #8eaa70;
   border: 0;
 }
+.tag {
+  display: inline-block;
+  font-size: 9px;
+  color: #7c8f62;
+  background: #eef2e2;
+  border: 1px solid #dde4c9;
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 4px;
+}
+.tag.bloom {
+  color: #b0729a;
+  background: #f8eef4;
+  border-color: #ecd3e2;
+}
+.tag.trait {
+  color: #8a7648;
+  background: #f7f1de;
+  border-color: #e8dcbc;
+}
+.variety-tag {
+  color: #7c8f62;
+  font-size: 9px;
+  margin-right: 3px;
+}
+.variety-seeds {
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.variety-seeds button {
+  flex: 1 1 30%;
+}
+.bloom-mark {
+  position: absolute;
+  left: 2px;
+  top: -9px;
+  color: #e8a7c8;
+  font-size: 11px;
+  z-index: 2;
+  text-shadow: 1px 1px #7c5a40;
+}
+.breeding-panel {
+  margin-top: 14px;
+  min-height: 305px;
+  padding: 19px 17px;
+}
+.cross-box {
+  border: 1px dashed #cfd8ba;
+  border-radius: 6px;
+  padding: 12px;
+  background: #fafbf2;
+}
+.parent-slots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.parent-slots > b {
+  color: #c990ae;
+  font-size: 16px;
+}
+.parent-slot {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e3e7d3;
+  border-radius: 5px;
+  padding: 7px 9px;
+  background: #fffef8;
+}
+.parent-slot.filled {
+  border-color: #a4b68b;
+  background: #f1f5e6;
+}
+.parent-slot small {
+  font-size: 9px;
+}
+.parent-slot strong {
+  flex: 1;
+  font-size: 10px;
+}
+.parent-slot button {
+  padding: 0 6px;
+  font-size: 11px;
+  border: 0;
+  background: transparent;
+  color: #9aa58a;
+}
+.preview {
+  font-size: 10px;
+  color: #6d7f52;
+  margin: 10px 0 8px;
+}
+.preview small {
+  margin-left: 6px;
+  font-size: 9px;
+}
+.cross-box > button {
+  width: 100%;
+  font-size: 11px;
+  padding: 8px;
+}
+.breeding-block {
+  margin-top: 16px;
+}
+.block-title {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #77905b;
+  margin-bottom: 8px;
+}
+.flower-row,
+.variety-row,
+.stock-row,
+.cross-row,
+.breed-order {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eff0e6;
+  font-size: 10px;
+}
+.flower-row > b,
+.variety-row > b,
+.stock-row > b {
+  font-size: 20px;
+  width: 24px;
+}
+.flower-row > div,
+.variety-row > div,
+.stock-row > div,
+.cross-row > div,
+.breed-order > div {
+  flex: 1;
+}
+.flower-row strong,
+.variety-row strong,
+.stock-row strong,
+.cross-row strong,
+.breed-order strong {
+  font-size: 10px;
+}
+.flower-row small,
+.variety-row small,
+.stock-row small,
+.cross-row small,
+.breed-order small {
+  display: block;
+  font-size: 9px;
+  margin-top: 3px;
+}
+.variety-row em {
+  color: #98a78b;
+  font-size: 9px;
+  margin-left: 4px;
+}
+.flower-row button {
+  font-size: 9px;
+  padding: 4px 7px;
+}
+.cross-row progress {
+  width: 55px;
+  height: 6px;
+}
+.cross-row button {
+  font-size: 9px;
+  padding: 4px 8px;
+}
+.cross-row input {
+  width: 90px;
+  font: inherit;
+  font-size: 10px;
+  padding: 5px 7px;
+  border: 1px solid #d9e0ce;
+  border-radius: 5px;
+  background: #fffdf5;
+  color: #314a38;
+}
+.breed-order .reward {
+  font-size: 12px;
+}
+.breed-order button {
+  font-size: 9px;
+  padding: 4px 9px;
+}
 @media (max-width: 1000px) {
   main {
     padding: 25px;

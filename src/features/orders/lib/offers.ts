@@ -1,4 +1,4 @@
-import type { Order } from "../../../shared/contracts";
+import type { Item, Order } from "../../../shared/contracts";
 export function initialOrders(hour: number): Order[] {
   return [
     {
@@ -30,7 +30,28 @@ export function initialOrders(hour: number): Order[] {
     },
   ];
 }
-export function nextOrder(serial: number, hour: number): Order {
+const processed: Partial<Record<Item, Item>> = {
+  berry: "jam",
+  corn: "flour",
+};
+export function nextOrder(
+  serial: number,
+  hour: number,
+  variety?: { id: string; item: Item } | null,
+): Order {
+  if (variety && serial % 3 === 0) {
+    const item = processed[variety.item] ?? variety.item;
+    return {
+      id: `o${serial}`,
+      item,
+      quantity: item === variety.item ? 4 : 2,
+      reward: Math.round((90 + serial * 3) * 1.6),
+      minQuality: 1,
+      deadline: hour + 60,
+      status: "open",
+      variety: variety.id,
+    };
+  }
   const item = serial % 2 ? "corn" : "berry";
   return {
     id: `o${serial}`,

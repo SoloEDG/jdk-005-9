@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import type { Batch } from "../../../shared/contracts";
+import type { Batch, Variety } from "../../../shared/contracts";
 import { items } from "../../../shared/catalog";
-defineProps<{
+const props = defineProps<{
   batches: readonly Readonly<Batch>[];
   hour: number;
   free: (id: string) => number;
   wasted: number;
+  varieties: readonly Variety[];
 }>();
 defineEmits<{ sell: [id: string] }>();
+const varietyName = (id?: string) =>
+  props.varieties.find((v) => v.id === id)?.name ?? "未知品种";
 </script>
 <template>
   <section class="panel warehouse-panel">
@@ -21,6 +24,9 @@ defineEmits<{ sell: [id: string] }>();
         <div>
           <strong
             >{{ items[batch.item].name }}
+            <em v-if="batch.variety" class="variety-tag"
+              >「{{ varietyName(batch.variety) }}」</em
+            >
             <em>{{ "★".repeat(batch.quality) }}</em></strong
           ><small
             >{{ batch.id }} · {{ batch.source }} · {{ batch.expires - hour }}h
@@ -37,6 +43,8 @@ defineEmits<{ sell: [id: string] }>();
       </div>
       <p v-if="!batches.length" class="empty">谷仓空了，去田里收获吧。</p>
     </div>
-    <p class="hint">按先到期批次配货 · 已占用货物不可出售</p>
+    <p class="hint">
+      按先到期批次配货 · 已占用货物不可出售 · 不同品种的库存各自独立，不会混成一堆
+    </p>
   </section>
 </template>

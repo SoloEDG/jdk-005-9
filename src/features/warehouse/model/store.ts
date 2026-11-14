@@ -21,9 +21,10 @@ export function createWarehouse(now: () => number, notice: Notice) {
     q = 1,
     hour = now(),
     source = "田间收获",
+    variety?: string,
   ) => {
     state.batches.push(
-      makeBatch(item, n, q, hour, `b${++state.serial}`, source),
+      makeBatch(item, n, q, hour, `b${++state.serial}`, source, variety),
     );
   };
   add("carrot", 8, 2);
@@ -36,7 +37,7 @@ export function createWarehouse(now: () => number, notice: Notice) {
       const b = state.batches.find((b) => b.id === id);
       return b ? available(b, state.reservations) : 0;
     },
-    reserve(owner: string, item: Item, n: number, minQuality = 1) {
+    reserve(owner: string, item: Item, n: number, minQuality = 1, variety?: string) {
       const allocations = allocate(
         state.batches,
         state.reservations,
@@ -44,6 +45,7 @@ export function createWarehouse(now: () => number, notice: Notice) {
         n,
         now(),
         minQuality,
+        variety,
       );
       if (!allocations) return null;
       const id = `r${++state.serial}`;
@@ -57,6 +59,12 @@ export function createWarehouse(now: () => number, notice: Notice) {
         const b = state.batches.find((b) => b.id === a.batch);
         if (!b || b.quantity < a.quantity || b.expires <= now()) return null;
       }
+      const varieties = new Set(
+        r.allocations.map(
+          (a) => state.batches.find((b) => b.id === a.batch)!.variety ?? null,
+        ),
+      );
+      const only = varieties.size === 1 ? [...varieties][0] : null;
       const receipt: Receipt = {
         quality: Math.min(
           ...r.allocations.map(
@@ -67,6 +75,7 @@ export function createWarehouse(now: () => number, notice: Notice) {
           (a) => state.batches.find((b) => b.id === a.batch)!.source,
         ),
         quantity: r.allocations.reduce((n, a) => n + a.quantity, 0),
+        variety: only ?? null,
       };
       for (const a of r.allocations)
         state.batches.find((b) => b.id === a.batch)!.quantity -= a.quantity;

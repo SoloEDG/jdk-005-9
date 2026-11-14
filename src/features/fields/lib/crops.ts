@@ -10,18 +10,29 @@ export const crops: Partial<
   berry: { cost: 12, duration: 24, yield: 3, repeat: 2 },
 };
 export function grow(crop: Crop, weather: Weather, hours: number) {
+  const drought = crop.traits?.drought ?? 1,
+    speed = crop.traits?.speed ?? 1;
   const water = Math.max(
     0,
-    Math.min(100, crop.water + (weather === "rain" ? 15 : -8) * hours),
+    Math.min(
+      100,
+      crop.water +
+        (weather === "rain" ? 15 : -(8 - (drought - 1) * 2)) * hours,
+    ),
   );
-  const rate = water > 0 ? (weather === "wind" ? 0.6 : 1) : 0.15;
+  const rate =
+    (water > 0 ? (weather === "wind" ? 0.6 : 1) : 0.15) *
+    (1 + (speed - 1) * 0.25);
   return {
     ...crop,
     water,
-    stress: crop.stress + (water === 0 ? hours : 0),
+    stress: crop.stress + (water === 0 ? (hours * (4 - drought)) / 3 : 0),
     growth: crop.growth + hours * rate,
   };
 }
 export function ready(crop: Crop) {
   return crop.growth >= (crops[crop.item]?.duration ?? Infinity);
+}
+export function flowering(crop: Crop) {
+  return crop.growth >= (crops[crop.item]?.duration ?? Infinity) * 0.6;
 }

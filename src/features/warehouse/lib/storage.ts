@@ -7,6 +7,7 @@ export function makeBatch(
   hour: number,
   id: string,
   source = "收获",
+  variety?: string,
 ): Batch {
   return {
     id,
@@ -15,6 +16,7 @@ export function makeBatch(
     quality,
     source,
     expires: hour + items[item].life,
+    ...(variety ? { variety } : {}),
   };
 }
 export function summarize(batches: readonly Readonly<Batch>[]) {

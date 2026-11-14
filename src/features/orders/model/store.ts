@@ -7,11 +7,17 @@ interface Ports {
     item: Item,
     n: number,
     minQuality?: number,
+    variety?: string,
   ) => string | null;
   consume: (id: string) => Receipt | null;
   release: (id: string) => void;
 }
-export function createOrders(ports: Ports, notice: Notice, hour: number) {
+export function createOrders(
+  ports: Ports,
+  notice: Notice,
+  hour: number,
+  pickVariety: () => { id: string; item: Item } | null = () => null,
+) {
   const state = reactive({
     coins: 180,
     xp: 0,
@@ -38,9 +44,14 @@ export function createOrders(ports: Ports, notice: Notice, hour: number) {
         o.item,
         o.quantity,
         o.minQuality,
+        o.variety,
       );
       if (!reservation) {
-        notice("可用库存不足，先收获或加工");
+        notice(
+          o.variety
+            ? "指定品种的可用库存不足，先收获或加工该品种"
+            : "可用库存不足，先收获或加工",
+        );
         return;
       }
       o.reservation = reservation;
@@ -62,7 +73,7 @@ export function createOrders(ports: Ports, notice: Notice, hour: number) {
       state.coins += o.reward;
       state.xp += 40 + (receipt.quality > 1 ? 10 : 0);
       state.delivered++;
-      state.orders.push(nextOrder(++state.serial, hour));
+      state.orders.push(nextOrder(++state.serial, hour, pickVariety()));
       notice(
         `交付成功，收入 ¥${o.reward} / +${40 + (receipt.quality > 1 ? 10 : 0)} 经验`,
       );

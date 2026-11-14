@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import type { Order } from "../../../shared/contracts";
+import type { Order, Variety } from "../../../shared/contracts";
 import { items } from "../../../shared/catalog";
-defineProps<{ orders: readonly Readonly<Order>[]; hour: number }>();
+const props = defineProps<{
+  orders: readonly Readonly<Order>[];
+  hour: number;
+  varieties: readonly Variety[];
+}>();
 defineEmits<{
   reserve: [id: string];
   deliver: [id: string];
@@ -13,6 +17,8 @@ const statusName = {
   delivered: "已交付",
   expired: "已过期",
 };
+const varietyName = (id?: string) =>
+  props.varieties.find((v) => v.id === id)?.name ?? "未知品种";
 </script>
 <template>
   <section class="panel orders-panel">
@@ -34,6 +40,9 @@ const statusName = {
         ><small
           >{{ order.id }} · {{ statusName[order.status] }} ·
           {{ Math.max(0, order.deadline - hour) }}h</small
+        >
+        <small v-if="order.variety" class="variety-tag"
+          >指定品种「{{ varietyName(order.variety) }}」</small
         >
       </div>
       <b class="reward">¥{{ order.reward }}</b>

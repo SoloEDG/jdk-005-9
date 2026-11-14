@@ -4,6 +4,7 @@ import { createFields } from "../features/fields";
 import { createWarehouse } from "../features/warehouse";
 import { createWorkshop } from "../features/workshop";
 import { createOrders, salePrice } from "../features/orders";
+import { createBreeding } from "../features/breeding";
 import { items } from "../shared/catalog";
 import { saveFarm, loadFarm } from "./persistence";
 export function createWorkspace() {
@@ -13,8 +14,31 @@ export function createWorkspace() {
   };
   const clock = createClock();
   const warehouse = createWarehouse(() => clock.state.hour, notice);
-  const orders = createOrders(warehouse, notice, clock.state.hour);
-  const fields = createFields(orders.spend, warehouse.add, notice);
+  let breeding: ReturnType<typeof createBreeding>;
+  const orders = createOrders(
+    warehouse,
+    notice,
+    clock.state.hour,
+    () => breeding?.pickVariety() ?? null,
+  );
+  const fields = createFields(
+    {
+      spend: orders.spend,
+      takeSeed: (stock) => breeding.takeSeed(stock),
+      keepSeeds: (variety, n, hour) => breeding.keepSeeds(variety, n, hour),
+    },
+    (item, n, q, variety) =>
+      warehouse.add(
+        item,
+        n,
+        q,
+        undefined,
+        variety ? `田间收获 · ${breeding.varietyName(variety)}` : "田间收获",
+        variety,
+      ),
+    notice,
+  );
+  breeding = createBreeding(fields, orders.earn, notice, clock.state.hour);
   const workshop = createWorkshop(
     { ...warehouse, spend: orders.spend },
     notice,
@@ -25,6 +49,7 @@ export function createWorkspace() {
     (t) => {
       warehouse.tick(t.to);
       fields.tick(t);
+      breeding.tick(t.to);
       workshop.tick(t.to);
       orders.tick(t.to);
     },
@@ -33,6 +58,7 @@ export function createWorkspace() {
     clock: clock.snapshot(),
     warehouse: warehouse.snapshot(),
     fields: fields.snapshot(),
+    breeding: breeding.snapshot(),
     workshop: workshop.snapshot(),
     orders: orders.snapshot(),
   });
@@ -40,10 +66,19 @@ export function createWorkspace() {
     clock,
     warehouse,
     fields,
+    breeding,
     workshop,
     orders,
     engine,
     notices,
+    harvestPlot(id: number, mode: "produce" | "seed") {
+      fields.harvest(id, mode, clock.state.hour);
+      breeding.cancelForPlot(id);
+    },
+    removePlot(id: number) {
+      fields.remove(id);
+      breeding.cancelForPlot(id);
+    },
     sell(id: string) {
       const item = warehouse.sell(id, 1);
       if (item) {
@@ -69,6 +104,7 @@ export function createWorkspace() {
         clock.restore(data.clock);
         warehouse.restore(data.warehouse);
         fields.restore(data.fields);
+        if (data.breeding) breeding.restore(data.breeding);
         workshop.restore(data.workshop);
         orders.restore(data.orders);
         notice("已恢复保存时刻");

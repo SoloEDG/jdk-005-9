@@ -13,6 +13,7 @@ interface Ports {
     q?: number,
     hour?: number,
     source?: string,
+    variety?: string,
   ) => void;
   spend: (n: number) => boolean;
 }
@@ -74,6 +75,7 @@ export function createWorkshop(ports: Ports, notice: Notice) {
         job.receipt.quality,
         job.finish,
         `工坊${job.id} · ${job.receipt.sources.join(" / ")}`,
+        job.receipt.variety ?? undefined,
       );
       job.status = "claimed";
       notice("成品已入仓");
