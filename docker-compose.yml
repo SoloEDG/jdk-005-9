@@ -1,0 +1,5 @@
+services:
+  farm:
+    build: .
+    ports:
+      - "18025:80"
